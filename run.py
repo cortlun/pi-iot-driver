@@ -97,18 +97,4 @@ if __name__ == "__main__":
             print("enqueue succeeded!!!!!!!!!!")
             time.sleep(configs['ENQUEUE_SECONDS'])
     except:
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        print("exception")
