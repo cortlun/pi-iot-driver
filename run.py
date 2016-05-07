@@ -47,7 +47,7 @@ def set_configs():
     
 def open_firewall():
     print("creating rules")
-    fwrules = [FirewallRuleInstance(configs['KAFKA_IP_PORT'].split(':')[1], 'tcp')]
+    fwrules = [FirewallRuleInstance(config['KAFKA_IP_PORT'].split(':')[1], 'tcp')]
     print("config with group: " + config['AWS_SECURITY_GROUP_NAME'])
     fwconfig = FirewallRuleConfig(config['AWS_SECURITY_GROUP_NAME'], fwrules)
     print("opening firewall")
