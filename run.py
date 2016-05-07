@@ -104,4 +104,4 @@ if __name__ == "__main__":
         print("whole message: " + m)
         producer.enqueue(m)
         print("enqueue succeeded!!!!!!!!!!")
-        time.sleep(configs['ENQUEUE_SECONDS'])
+        time.sleep(float(configs['ENQUEUE_SECONDS']))

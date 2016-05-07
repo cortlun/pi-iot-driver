@@ -13,7 +13,7 @@ class IotProducer:
         print("created producer")
     def enqueue(self, m):
         print("In enqueue method!!!!!!!")
-        m = {'hello' : 'world'}
+        #m = {'hello' : 'world'}
         try:
             print("attempting to send message to queue: " + self.discriminator)
             self.producer.send(self.discriminator, m)
