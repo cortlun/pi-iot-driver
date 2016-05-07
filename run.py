@@ -66,24 +66,24 @@ if __name__ == "__main__":
         #get environment configs
         print("setting configs...")
         set_configs()
-    
+        
         #create firewall rules
         print("creating firewall rules...")
         open_firewall()
-    
+        
         #start geotagger
         print("starting geotagger...")
         gt = GeoTagger()
         gt.start()
-    
+        
         #create sensorinterface
         print("creating sensor...")
         sensor = SensorInterface()
-    
+        
         #create kafka producer
         print("starting kafka producer...")
         producer = IotProducer(configs['KAFKA_IP_PORT'], config['DISCRIMINATOR'])
-    
+        
         #create and enqueue json every x seconds
         while True:
             print("getting payload...")
