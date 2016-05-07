@@ -1,7 +1,7 @@
 from subprocess import Popen, PIPE
 import os
 from os.path import expanduser
-import urllib2.request
+import urllib
 #from Crypto.PublicKey import RSA
 
 class ChildProcessUtils:
@@ -67,7 +67,7 @@ class AwsUtils:
     def describe_instance_status(self, instance_id):
         return self.cp_utils.spawn_child_process(["aws", "ec2", "describe-instance-status", "--instance-id", instance_id])
     def get_my_current_ip(self):
-        return urllib2.request.urlopen("http://checkip.amazonaws.com").read().decode("utf-8").rstrip("\r\n") + "/32"
+        return urllib.urlopen("http://checkip.amazonaws.com").read().decode("utf-8").rstrip("\r\n") + "/32"
     def log_current_ip(self):
         if not os.path.exists(self.aws_utils_home):
             os.makedirs(self.aws_utils_home)
