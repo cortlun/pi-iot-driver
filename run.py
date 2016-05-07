@@ -50,6 +50,11 @@ def open_firewall():
     fwconfig = FirewallRuleConfig(configs['AWS_SECURITY_GROUP_NAME', fwrules])
     fwconfig.open_firewall
 
+def init_aws_creds():
+    os.environ['AWS_ACCESS_KEY_ID'] = config['AWS_KEY']
+    os.environ['AWS_SECRET_ACCESS_KEY'] = config['AWS_SECRET_KEY']
+    os.environ['AWS_DEFAULT_REGION'] = config['AWS_REGION']
+
 def check_geotag():
     {'geotag':
         {
@@ -66,27 +71,37 @@ def create_json(geotag, payload):
 
 if __name__ == "__main__":
     #get environment configs
+    print("setting configs...")
     set_configs()
     
     #create firewall rules
+    print("creating firewall rules...")
     open_firewall()
     
     #start geotagger
+    print("starting geotagger...")
     gt = GeoTagger()
     gt.start()
     
     #create sensorinterface
+    print("creating sensor...")
     sensor = SensorInterface()
     
     #create kafka producer
+    print("starting kafka producer...")
     producer = IotProducer(configs['KAFKA_IP_PORT'])
     
     #create and enqueue json every x seconds
     while True:
+        print("getting payload...")
         payload = sensor.check_sensor()
+        print("payload: " + payload)
         geotag = check_geotag()
+        print ("geotag: " + geotag)
         m = create_json(geotag, payload)
+        print("whole message: " + m)
         producer.enqueue(m)
+        print("enqueue succeeded!!!!!!!!!!")
         time.sleep(configs['ENQUEUE_SECONDS'])
     
     
