@@ -56,18 +56,10 @@ def init_aws_creds():
     os.environ['AWS_DEFAULT_REGION'] = config['AWS_REGION']
 
 def check_geotag():
-    {'geotag':
-        {
-            'lat': gpsd.fix.latitude,
-            'lon': gpsd.fix.longitude,
-            'time': gpds.utc + gpsd.fix.time,
-            'alt': gpsd.fix.altitude,
-            'cnt': len(gpsd.satellites)
-        }
-    }
+    return '"geotag":{"lat":' + gpsd.fix.latitude + ',"lon":' + gpsd.fix.longitude + ',"time":' + gpds.utc + gpsd.fix.time + ',"alt":' + gpsd.fix.altitude + ',"cnt":' + len(gpsd.satellites) + '}'
     
 def create_json(geotag, payload):
-    {'message': geotag, payload}
+    return '{"message": {' + check_geotag() + "," + get_payload() + "}}"
 
 if __name__ == "__main__":
     #get environment configs
