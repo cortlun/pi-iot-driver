@@ -48,7 +48,7 @@ def set_configs():
 def open_firewall():
     fwrules = [FirewallRuleInstance(configs['KAFKA_IP_PORT'].split(':')[1], 'tcp')]
     fwconfig = FirewallRuleConfig(configs['AWS_SECURITY_GROUP_NAME'], fwrules)
-    fwconfig.open_firewall
+    fwconfig.open_firewall()
 
 def init_aws_creds():
     os.environ['AWS_ACCESS_KEY_ID'] = config['AWS_KEY']
@@ -98,3 +98,4 @@ if __name__ == "__main__":
             time.sleep(configs['ENQUEUE_SECONDS'])
     except:
         print("exception")
+        gt.running = False
