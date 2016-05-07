@@ -40,8 +40,8 @@ def set_configs():
     global configs
     for line in lines:
         parts = line.split("=")
-        print("line part 0: " line[0])
-        print("line part 1: " line[1])
+        print("line part 0: " + line[0])
+        print("line part 1: " + line[1])
         configs[line[0]] = line[1]
     print("configs: " + configs)
     
