@@ -65,40 +65,36 @@ def create_json(geotag, payload):
     return '{"message": {' + check_geotag() + "," + get_payload() + "}}"
 
 if __name__ == "__main__":
-    try: 
-        #get environment configs
-        print("setting configs...")
-        set_configs()
-        
-        #create firewall rules
-        print("creating firewall rules...")
-        open_firewall()
-        
-        #start geotagger
-        print("starting geotagger...")
-        gt = GeoTagger()
-        gt.start()
-        
-        #create sensorinterface
-        print("creating sensor...")
-        sensor = SensorInterface()
-        
-        #create kafka producer
-        print("starting kafka producer...")
-        producer = IotProducer(configs['KAFKA_IP_PORT'], config['DISCRIMINATOR'])
-        
-        #create and enqueue json every x seconds
-        while True:
-            print("getting payload...")
-            payload = sensor.check_sensor()
-            print("payload: " + payload)
-            geotag = check_geotag()
-            print ("geotag: " + geotag)
-            m = create_json(geotag, payload)
-            print("whole message: " + m)
-            producer.enqueue(m)
-            print("enqueue succeeded!!!!!!!!!!")
-            time.sleep(configs['ENQUEUE_SECONDS'])
-    except:
-        print("exception")
-        gt.running = False
+    #get environment configs
+    print("setting configs...")
+    set_configs()
+    
+    #create firewall rules
+    print("creating firewall rules...")
+    open_firewall()
+    
+    #start geotagger
+    print("starting geotagger...")
+    gt = GeoTagger()
+    gt.start()
+    
+    #create sensorinterface
+    print("creating sensor...")
+    sensor = SensorInterface()
+    
+    #create kafka producer
+    print("starting kafka producer...")
+    producer = IotProducer(configs['KAFKA_IP_PORT'], config['DISCRIMINATOR'])
+    
+    #create and enqueue json every x seconds
+    while True:
+        print("getting payload...")
+        payload = sensor.check_sensor()
+        print("payload: " + payload)
+        geotag = check_geotag()
+        print ("geotag: " + geotag)
+        m = create_json(geotag, payload)
+        print("whole message: " + m)
+        producer.enqueue(m)
+        print("enqueue succeeded!!!!!!!!!!")
+        time.sleep(configs['ENQUEUE_SECONDS'])
