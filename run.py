@@ -48,21 +48,21 @@ def set_configs():
 def open_firewall():
     print("creating rules")
     fwrules = [FirewallRuleInstance(configs['KAFKA_IP_PORT'].split(':')[1], 'tcp')]
-    print("config with group: " + configs['AWS_SECURITY_GROUP_NAME'])
-    fwconfig = FirewallRuleConfig(configs['AWS_SECURITY_GROUP_NAME'], fwrules)
+    print("config with group: " + configs['AWS_SECURITY_GROUP_NAME'].replace('\n', '').replace('\r', '').replace(' ', ''))
+    fwconfig = FirewallRuleConfig(configs['AWS_SECURITY_GROUP_NAME'].replace('\n', '').replace('\r', '').replace(' ', ''), fwrules)
     print("opening firewall")
     fwconfig.open_firewall()
 
-def init_aws_creds():
-    os.environ['AWS_ACCESS_KEY_ID'] = configs['AWS_KEY']
-    os.environ['AWS_SECRET_ACCESS_KEY'] = configs['AWS_SECRET_KEY']
-    os.environ['AWS_DEFAULT_REGION'] = configs['AWS_REGION']
+#def init_aws_creds():
+    #os.environ['AWS_ACCESS_KEY_ID'] = configs['AWS_KEY']
+    #os.environ['AWS_SECRET_ACCESS_KEY'] = configs['AWS_SECRET_KEY']
+    #os.environ['AWS_DEFAULT_REGION'] = configs['AWS_REGION']
 
 def check_geotag():
-    return '"geotag":{"lat":' + gpsd.fix.latitude + ',"lon":' + gpsd.fix.longitude + ',"time":' + gpds.utc + gpsd.fix.time + ',"alt":' + gpsd.fix.altitude + ',"cnt":' + len(gpsd.satellites) + '}'
+    return '"geotag":{"lat":' + str(gpsd.fix.latitude) + ',"lon":' + str(gpsd.fix.longitude) + ',"time":' + str(gpsd.utc) + str(gpsd.fix.time) + ',"alt":' + str(gpsd.fix.altitude) + ',"cnt":' + str(len(gpsd.satellites)) + '}'
     
 def create_json(geotag, payload):
-    return '{"message": {' + check_geotag() + "," + get_payload() + "}}"
+    return '{"message": {' + geotag + "," + payload + "}}"
 
 if __name__ == "__main__":
     #get environment configs
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     set_configs()
     
     #set aws values
-    init_aws_creds()
+    #init_aws_creds()
     
     #create firewall rules
     print("creating firewall rules...")
@@ -87,7 +87,11 @@ if __name__ == "__main__":
     
     #create kafka producer
     print("starting kafka producer...")
-    producer = IotProducer(configs['KAFKA_IP_PORT'], configs['DISCRIMINATOR'])
+    ip = configs['KAFKA_IP_PORT'].replace('\r', '').replace('\n','').replace(' ','')
+    print("ip: " + ip)
+    d = configs['DISCRIMINATOR'].replace('\n','').replace('\r','').replace(' ','')
+    print(d)
+    producer = IotProducer(ip, d)
     
     #create and enqueue json every x seconds
     while True:

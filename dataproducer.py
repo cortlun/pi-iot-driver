@@ -12,19 +12,17 @@ class IotProducer:
         #self.producer = KafkaProducer(bootstrap_servers=[kafka_ip_ports])
         print("created producer")
     def enqueue(self, m):
-        #m = {'hello' : 'world'}
+        print("In enqueue method!!!!!!!")
+        m = {'hello' : 'world'}
         try:
-            self.producer.send(discriminator, m)
+            print("attempting to send message to queue: " + self.discriminator)
+            self.producer.send(self.discriminator, m)
+            print("message succeeded!!!!!")
         except:
+            print("Exception")
             time.sleep(1)
-            self.producer.send(discriminator, m)
+            self.producer.send(self.discriminator, m)
     def close(self):
         print("shutting down")
         self.producer.close()
 
-if __name__ == "__main__":
-    producer = IotProducer("52.70.166.27:9092")
-    for x in range (0,10):
-        producer.enqueue(x)
-        time.sleep(15)
-    producer.close()

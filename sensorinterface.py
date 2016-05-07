@@ -6,7 +6,7 @@ class SensorInterface:
     Be sure to implement the check_sensor method and return a dictionary object
     of key/value pairs from your sensor."""
     def check_sensor( self ):
-        return '"payload":{"randomnum":' + random.random() * 100 + '}'
+        return '"payload":{"randomnum":' + str(random.random() * 100) + '}'
 
 if __name__ == "__main__":
     test = SensorInterface()
