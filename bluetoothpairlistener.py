@@ -1,42 +1,79 @@
+#!/usr/bin/env python
+import sys
+import signal
+import logging
 import dbus
-from dbus.mainloop.glib import DBusGMainLoop
+import dbus.service
+import dbus.mainloop.glib
 import gobject
+from awsutils import ChildProcessUtils
+from run import 
+LOG_LEVEL = logging.INFO
+#LOG_LEVEL = logging.DEBUG
+LOG_FILE = "/dev/stdout"
+#LOG_FILE = "/var/log/syslog"
+LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
 
-import subprocess
+def device_property_changed_cb(property_name, value, path, interface):
+    device = dbus.Interface(bus.get_object("org.bluez", path), "org.bluez.Device")
+    properties = device.GetProperties()
 
-# ID of the device we care about
-DEV_ID = 'D8_D1_CB_A6_66_DA '
+    if (property_name == "Connected"):
+        action = "connected" if value else "disconnected"
+#
+# Replace with your code to write to the PiFace
+#
 
-dbus_loop = DBusGMainLoop()
-bus = dbus.SystemBus(mainloop=dbus_loop)
+        print("value: " + value)
+        print("interface: " + interface)
+        print("path: " + path)
+        print("The device %s [%s] is %s " % (properties["Alias"], properties["Address"], action))
+        cp = ChildProcessUtils()
+        cp.spawn_child_process(["sudo", "ifdown", "bnet0"])
+        cp.spawn_child_process(["sudo","pand","-c", configs['IPHONE_MAC_ADDRESS'],"-role", "PANU", "--persist", "30" ])
+        cp.spawn_child_process(["sudo","ifup","bnet0"])
+        
+def set_configs():
+    configfile = os.path.join("/boot", "iot.config")
+    lines = list(open(configfile))
+    global configs
+    for line in lines:
+        print("in for")
+        parts = line.split("=")
+        print("part 0: " + parts[0])
+        print("part 1: " + parts[1])
+        configs[parts[0]] = parts[1]
 
-# Figure out the path to the headset
-man = bus.get_object('org.bluez', '/')
-iface = dbus.Interface(man, 'org.bluez.Manager')
-adapterPath = iface.DefaultAdapter()
+def shutdown(signum, frame):
+    mainloop.quit()
 
-headset = bus.get_object('org.bluez', adapterPath + '/dev_' + DEV_ID)
-    # ^^^ I'm not sure if that's kosher. But it works.
+if __name__ == "__main__":
+    # shut down on a TERM signal
+    signal.signal(signal.SIGTERM, shutdown)
 
-def cb(iface=None, mbr=None, path=None):
+    # start logging
+    logging.basicConfig(filename=LOG_FILE, format=LOG_FORMAT, level=LOG_LEVEL)
+    logging.info("Starting btminder to monitor Bluetooth connections")
 
-    if ("org.bluez.Headset" == iface and path.find(DEV_ID) > -1):
-        print 'iface: %s' % iface
-        print 'mbr: %s' % mbr
-        print 'path: %s' % path
-        print "\n"
-        print "matched"
+    # Get the system bus
+    try:
+        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+        bus = dbus.SystemBus()
+    except Exception as ex:
+        logging.error("Unable to get the system dbus: '{0}'. Exiting btminder. Is dbus running?".format(ex.message))
+        sys.exit(1)
 
-        if mbr == "Connected":
-            subprocess.call(["clementine", "--play"])
-            print 'conn'
+    # listen for signals on the Bluez bus
+    bus.add_signal_receiver(device_property_changed_cb, bus_name="org.bluez", signal_name="PropertyChanged",
+            dbus_interface="org.bluez.Device", path_keyword="path", interface_keyword="interface")
 
-        elif mbr == "Disconnected":
-            subprocess.call(["clementine", "--stop"])
-            print 'dconn'
+    try:
+        mainloop = gobject.MainLoop()
+        mainloop.run()
+    except KeyboardInterrupt:
+        pass
+    except:
+        logging.error("Unable to run the gobject main loop")
 
-headset.connect_to_signal("Connected", cb, interface_keyword='iface', member_keyword='mbr', path_keyword='path')
-headset.connect_to_signal("Disconnected", cb, interface_keyword='iface', member_keyword='mbr', path_keyword='path')
-
-loop = gobject.MainLoop()
-loop.run()
+    logging.info("Shutting down btminder")
+    sys.exit(0)
