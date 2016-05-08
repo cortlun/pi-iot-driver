@@ -23,8 +23,8 @@ def cb(iface=None, mbr=None, path=None):
 	print("mbr: " + mbr)
 	print("path: " + path)
 
-headset.connect_to_signal("Connected", cb, interface_keyword='iface', member_keyword='mbr', path_keyword='path')
-headset.connect_to_signal("Disconnected", cb, interface_keyword='iface', member_keyword='mbr', path_keyword='path')
+iphone.connect_to_signal("Connected", cb, interface_keyword='iface', member_keyword='mbr', path_keyword='path')
+iphone.connect_to_signal("Disconnected", cb, interface_keyword='iface', member_keyword='mbr', path_keyword='path')
 
 loop = gobject.MainLoop()
 loop.run()
