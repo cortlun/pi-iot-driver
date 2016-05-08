@@ -11,6 +11,13 @@ class ChildProcessUtils:
         self.log_directory = os.path.join(self.aws_utils_home, "logs")
         self.previous_ip_location = os.path.join(self.aws_utils_home, "last_ip.txt")
         self.log_file = log_file
+
+    def __init__(self):
+        self.user_home = os.path.expanduser("~")
+        self.aws_utils_home = os.path.join(self.user_home, "awsutils")
+        self.log_directory = os.path.join(self.aws_utils_home, "logs")
+        self.previous_ip_location = os.path.join(self.aws_utils_home, "last_ip.txt")
+    
     def spawn_child_process(self, args):
         p = Popen(args, stdout=PIPE, stderr=PIPE)
         out, err = p.communicate()

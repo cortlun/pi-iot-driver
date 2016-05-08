@@ -6,8 +6,11 @@ import dbus
 import dbus.service
 import dbus.mainloop.glib
 import gobject
+import os
 from awsutils import ChildProcessUtils
-from run import 
+
+configs = {}
+ 
 LOG_LEVEL = logging.INFO
 #LOG_LEVEL = logging.DEBUG
 LOG_FILE = "/dev/stdout"
@@ -24,9 +27,10 @@ def device_property_changed_cb(property_name, value, path, interface):
 # Replace with your code to write to the PiFace
 #
 
-        print("value: " + value)
-        print("interface: " + interface)
-        print("path: " + path)
+        set_configs()
+        print("value: " + str(value))
+        print("interface: " + str(interface))
+        print("path: " + str(path))
         print("The device %s [%s] is %s " % (properties["Alias"], properties["Address"], action))
         cp = ChildProcessUtils()
         cp.spawn_child_process(["sudo", "ifdown", "bnet0"])

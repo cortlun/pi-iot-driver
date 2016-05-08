@@ -23,9 +23,9 @@ def device_property_changed_cb(property_name, value, path, interface):
 #
 # Replace with your code to write to the PiFace
 #
-        print("value: " + value)
-        print("interface: " + interface)
-        print("path: " + path)
+        print("value: " + str(value))
+        print("interface: " + str(interface))
+        print("path: " + str(path))
         print("The device %s [%s] is %s " % (properties["Alias"], properties["Address"], action))
 
 def shutdown(signum, frame):
