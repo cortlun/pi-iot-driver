@@ -5,13 +5,6 @@ import urllib
 #from Crypto.PublicKey import RSA
 
 class ChildProcessUtils:
-    def __init__(self, log_file):
-        self.user_home = os.path.expanduser("~")
-        self.aws_utils_home = os.path.join(self.user_home, "awsutils")
-        self.log_directory = os.path.join(self.aws_utils_home, "logs")
-        self.previous_ip_location = os.path.join(self.aws_utils_home, "last_ip.txt")
-        self.log_file = log_file
-
     def __init__(self):
         self.user_home = os.path.expanduser("~")
         self.aws_utils_home = os.path.join(self.user_home, "awsutils")
@@ -32,7 +25,7 @@ class AwsUtils:
         self.aws_utils_home = os.path.join(self.user_home, "awsutils")
         self.log_directory = os.path.join(self.aws_utils_home, "logs")
         self.previous_ip_location = os.path.join(self.aws_utils_home, "last_ip.txt")
-        self.cp_utils = ChildProcessUtils("aws_utils.log")
+        self.cp_utils = ChildProcessUtils()
     def add_user_to_group(self, user_name, group_name):
         return self.cp_utils.spawn_child_process(["aws", "iam", "add-user-to-group", "--user-name", user_name, "--group-name", group_name])
     def attach_policy_to_group(self,policy_arn, group_name):

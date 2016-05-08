@@ -7,7 +7,8 @@ import sensorinterface
 from initfirewallconfigs import FirewallRuleConfig, FirewallRuleInstance
 from sensorinterface import SensorInterface
 from dataproducer import IotProducer
-
+import logging
+logging.basicFileConfig(filename='\home\pi\logs\iot.out',level=logging.info)
 gpsd = None #global gpsd variable
 configs = {} #dictionary object to store configs
 config_location = "/etc/boot"
@@ -39,18 +40,18 @@ def set_configs():
     lines = list(open(configfile))
     global configs
     for line in lines:
-        print("in for")
+        logging.info("in for")
         parts = line.split("=")
-        print("part 0: " + parts[0])
-        print("part 1: " + parts[1])
+        logging.info("part 0: " + parts[0])
+        logging.info("part 1: " + parts[1])
         configs[parts[0]] = parts[1]
     
 def open_firewall():
-    print("creating rules")
+    logging.info("creating rules")
     fwrules = [FirewallRuleInstance(configs['KAFKA_IP_PORT'].split(':')[1], 'tcp')]
-    print("config with group: " + configs['AWS_SECURITY_GROUP_NAME'].replace('\n', '').replace('\r', '').replace(' ', ''))
+    logging.info("config with group: " + configs['AWS_SECURITY_GROUP_NAME'].replace('\n', '').replace('\r', '').replace(' ', ''))
     fwconfig = FirewallRuleConfig(configs['AWS_SECURITY_GROUP_NAME'].replace('\n', '').replace('\r', '').replace(' ', ''), fwrules)
-    print("opening firewall")
+    logging.info("opening firewall")
     fwconfig.open_firewall()
 
 #def init_aws_creds():
@@ -66,42 +67,42 @@ def create_json(geotag, payload):
 
 if __name__ == "__main__":
     #get environment configs
-    print("setting configs...")
+    logging.info("setting configs...")
     set_configs()
     
     #set aws values
     #init_aws_creds()
     
     #create firewall rules
-    print("creating firewall rules...")
+    logging.info("creating firewall rules...")
     open_firewall()
     
     #start geotagger
-    print("starting geotagger...")
+    logging.info("starting geotagger...")
     gt = GeoTagger()
     gt.start()
     
     #create sensorinterface
-    print("creating sensor...")
+    logging.info("creating sensor...")
     sensor = SensorInterface()
     
     #create kafka producer
-    print("starting kafka producer...")
+    logging.info("starting kafka producer...")
     ip = configs['KAFKA_IP_PORT'].replace('\r', '').replace('\n','').replace(' ','')
-    print("ip: " + ip)
+    logging.info("ip: " + ip)
     d = configs['DISCRIMINATOR'].replace('\n','').replace('\r','').replace(' ','')
-    print(d)
+    logging.info(d)
     producer = IotProducer(ip, d)
     
     #create and enqueue json every x seconds
     while True:
-        print("getting payload...")
+        logging.info("getting payload...")
         payload = sensor.check_sensor()
-        print("payload: " + payload)
+        logging.info("payload: " + payload)
         geotag = check_geotag()
-        print ("geotag: " + geotag)
+        logging.info ("geotag: " + geotag)
         m = create_json(geotag, payload)
-        print("whole message: " + m)
+        logging.info("whole message: " + m)
         producer.enqueue(m)
-        print("enqueue succeeded!!!!!!!!!!")
+        logging.info("enqueue succeeded!!!!!!!!!!")
         time.sleep(float(configs['ENQUEUE_SECONDS']))

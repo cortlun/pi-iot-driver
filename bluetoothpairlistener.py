@@ -13,7 +13,7 @@ configs = {}
  
 LOG_LEVEL = logging.INFO
 #LOG_LEVEL = logging.DEBUG
-LOG_FILE = "/dev/stdout"
+LOG_FILE = "/home/pi/bluetoothpairlistener.out"
 #LOG_FILE = "/var/log/syslog"
 LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
 
@@ -28,24 +28,24 @@ def device_property_changed_cb(property_name, value, path, interface):
 #
 
         set_configs()
-        print("value: " + str(value))
-        print("interface: " + str(interface))
-        print("path: " + str(path))
-        print("The device %s [%s] is %s " % (properties["Alias"], properties["Address"], action))
+        logging.info("value: " + str(value))
+        logging.info("interface: " + str(interface))
+        logging.info("path: " + str(path))
+        logging.info("The device %s [%s] is %s " % (properties["Alias"], properties["Address"], action))
         cp = ChildProcessUtils()
-        cp.spawn_child_process(["sudo", "ifdown", "bnet0"])
-        cp.spawn_child_process(["sudo","pand","-c", configs['IPHONE_MAC_ADDRESS'],"-role", "PANU", "--persist", "30" ])
-        cp.spawn_child_process(["sudo","ifup","bnet0"])
+        mac = configs['IPHONE_MAC_ADDRESS'].replace('\n', '').replace('\r', '').replace(' ', '')
+        logging.info("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
+        logging.info("pand" + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
         
 def set_configs():
     configfile = os.path.join("/boot", "iot.config")
     lines = list(open(configfile))
     global configs
     for line in lines:
-        print("in for")
+        logging.info("in for")
         parts = line.split("=")
-        print("part 0: " + parts[0])
-        print("part 1: " + parts[1])
+        logging.info("part 0: " + parts[0])
+        logging.info("part 1: " + parts[1])
         configs[parts[0]] = parts[1]
 
 def shutdown(signum, frame):
