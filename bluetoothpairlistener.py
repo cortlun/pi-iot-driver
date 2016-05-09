@@ -28,7 +28,6 @@ def device_property_changed_cb(property_name, value, path, interface):
 #
 # Replace with your code to write to the PiFace
 #
-
         set_configs()
         logging.info("value: " + str(value))
         logging.info("interface: " + str(interface))
@@ -38,7 +37,10 @@ def device_property_changed_cb(property_name, value, path, interface):
         mac = configs['IPHONE_MAC_ADDRESS'].replace('\n', '').replace('\r', '').replace(' ', '')
         logging.info("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
         logging.info("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
-        global disconnected
+        logging.info("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
+        logging.info("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
+        
+		global disconnected
         while disconnected:
             try:
                 logging.info("in try.")
