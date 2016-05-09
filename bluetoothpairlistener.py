@@ -10,6 +10,7 @@ import os
 from awsutils import ChildProcessUtils
 
 configs = {}
+disconnected = True
  
 LOG_LEVEL = logging.INFO
 #LOG_LEVEL = logging.DEBUG
@@ -36,15 +37,16 @@ def device_property_changed_cb(property_name, value, path, interface):
         mac = configs['IPHONE_MAC_ADDRESS'].replace('\n', '').replace('\r', '').replace(' ', '')
         logging.info("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
         logging.info("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
-        #logging.info("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
-        #logging.info("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))        
-        try:
-            logging.info("in try.")
-            logging.info("testing get: " + urllib.open("http://google.com"))
-        except:
-            logging.info("exception occurred.  restarting iface  and trying again.")
-            logging.info("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
-            logging.info("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0]))
+        while disconnected:
+		    try:
+                logging.info("in try.")
+                logging.info("testing get: " + urllib.open("http://google.com"))
+				disconnected = False
+            except Exception as e:
+                logging.info("exception occurred.  restarting iface  and trying again: " + str(e))
+                logging.info("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
+                logging.info("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0]))
+
 def set_configs():
     configfile = os.path.join("/boot", "iot.config")
     lines = list(open(configfile))
@@ -84,8 +86,8 @@ if __name__ == "__main__":
         mainloop.run()
     except KeyboardInterrupt:
         pass
-    except:
-        logging.error("Unable to run the gobject main loop")
+    except Exception as e:
+        logging.error("Unable to run the gobject main loop: " + str(e))
 
     logging.info("Shutting down btminder")
     sys.exit(0)

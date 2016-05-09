@@ -89,17 +89,30 @@ if __name__ == "__main__":
     logging.info("ip: " + ip)
     d = configs['DISCRIMINATOR'].replace('\n','').replace('\r','').replace(' ','')
     logging.info(d)
-    producer = IotProducer(ip, d)
+	try :
+        producer = IotProducer(ip, d)
+    except Exception as e: 
+	    logging.info("Exception creating producer:" + str(e))
+		sys.exit(1)
     
     #create and enqueue json every x seconds
-    while True:
-        logging.info("getting payload...")
-        payload = sensor.check_sensor()
-        logging.info("payload: " + payload)
-        geotag = check_geotag()
-        logging.info ("geotag: " + geotag)
-        m = create_json(geotag, payload)
-        logging.info("whole message: " + m)
-        producer.enqueue(m)
-        logging.info("enqueue succeeded!!!!!!!!!!")
-        time.sleep(float(configs['ENQUEUE_SECONDS']))
+	try :
+        while True:
+            logging.info("getting payload...")
+            payload = sensor.check_sensor()
+            logging.info("payload: " + payload)
+            geotag = check_geotag()
+            logging.info ("geotag: " + geotag)
+            m = create_json(geotag, payload)
+            logging.info("whole message: " + m)
+            producer.enqueue(m)
+            logging.info("enqueue succeeded!!!!!!!!!!")
+            time.sleep(float(configs['ENQUEUE_SECONDS']))
+    except KeyboardInterrupt:
+	    pass
+    except Exception as e:
+	    logging.info("exception: " + str(e))
+		sys.exit(1)
+		
+	logging.info("shutting down."
+	sys.exit(0)
