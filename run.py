@@ -43,11 +43,11 @@ def set_configs():
         configs[parts[0]] = parts[1]
     
 def open_firewall():
-    logging.info("creating rules")
+    print("creating rules")
     fwrules = [FirewallRuleInstance(configs['KAFKA_IP_PORT'].split(':')[1], 'tcp')]
-    logging.info("config with group: " + configs['AWS_SECURITY_GROUP_NAME'].replace('\n', '').replace('\r', '').replace(' ', ''))
+    print("config with group: " + configs['AWS_SECURITY_GROUP_NAME'].replace('\n', '').replace('\r', '').replace(' ', ''))
     fwconfig = FirewallRuleConfig(configs['AWS_SECURITY_GROUP_NAME'].replace('\n', '').replace('\r', '').replace(' ', ''), fwrules)
-    logging.info("opening firewall")
+    print("opening firewall")
     fwconfig.open_firewall()
 
 #def init_aws_creds():
@@ -64,57 +64,57 @@ def create_json(geotag, payload):
 if __name__ == "__main__":
     logging.basicConfig(filename="/home/pi/logs/iot.out",level=logging.INFO)
     #get environment configs
-    logging.info("setting configs...")
+    print("setting configs...")
     set_configs()
     
     #set aws values
     #init_aws_creds()
     
     #create firewall rules
-    logging.info("creating firewall rules...")
+    print("creating firewall rules...")
     try:
         open_firewall()
     except:
         pass
     #start geotagger
-    logging.info("starting geotagger...")
+    print("starting geotagger...")
     gt = GeoTagger()
     gt.start()
     
     #create sensorinterface
-    logging.info("creating sensor...")
+    print("creating sensor...")
     sensor = SensorInterface()
     
     #create kafka producer
-    logging.info("starting kafka producer...")
+    print("starting kafka producer...")
     ip = configs['KAFKA_IP_PORT'].replace('\r', '').replace('\n','').replace(' ','')
-    logging.info("ip: " + ip)
+    print("ip: " + ip)
     d = configs['DISCRIMINATOR'].replace('\n','').replace('\r','').replace(' ','')
-    logging.info(d)
+    print(d)
     try :
         producer = IotProducer(ip, d)
     except Exception as e: 
-        logging.info("Exception creating producer:" + str(e))
+        print("Exception creating producer:" + str(e))
         sys.exit(1)
     
     #create and enqueue json every x seconds
     try :
         while True:
-            logging.info("getting payload...")
+            print("getting payload...")
             payload = sensor.check_sensor()
-            logging.info("payload: " + payload)
+            print("payload: " + payload)
             geotag = check_geotag()
-            logging.info ("geotag: " + geotag)
+            print ("geotag: " + geotag)
             m = create_json(geotag, payload)
-            logging.info("whole message: " + m)
+            print("whole message: " + m)
             producer.enqueue(m)
-            logging.info("enqueue succeeded!!!!!!!!!!")
+            print("enqueue succeeded!!!!!!!!!!")
             time.sleep(float(configs['ENQUEUE_SECONDS']))
     except KeyboardInterrupt:
         pass
     except Exception as e:
-        logging.info("exception: " + str(e))
+        print("exception: " + str(e))
         sys.exit(1)
 
-    logging.info("shutting down.")
+    print("shutting down.")
     sys.exit(0)
