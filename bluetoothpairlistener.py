@@ -13,7 +13,7 @@ from awsutils import ChildProcessUtils
 configs = {}
 disconnected = True
  
-LOG_LEVEL = logging.INFO
+LOG_LEVEL = print
 #LOG_LEVEL = logging.DEBUG
 LOG_FILE = "/home/pi/logs/bt.out"
 #LOG_FILE = "/var/log/syslog"
@@ -22,46 +22,46 @@ LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
 def device_property_changed_cb(property_name, value, path, interface):
     device = dbus.Interface(bus.get_object("org.bluez", path), "org.bluez.Device")
     properties = device.GetProperties()
-    logging.info("property name: " + property_name)
+    print("property name: " + property_name)
     if (property_name == "Connected"):
         action = "connected" if value else "disconnected"
 #
 # Replace with your code to write to the PiFace
 #
         set_configs()
-        logging.info("value: " + str(value))
-        logging.info("interface: " + str(interface))
-        logging.info("path: " + str(path))
-        logging.info("The device %s [%s] is %s " % (properties["Alias"], properties["Address"], action))
+        print("value: " + str(value))
+        print("interface: " + str(interface))
+        print("path: " + str(path))
+        print("The device %s [%s] is %s " % (properties["Alias"], properties["Address"], action))
         cp = ChildProcessUtils()
         mac = configs['IPHONE_MAC_ADDRESS'].replace('\n', '').replace('\r', '').replace(' ', '')
-        logging.info("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
-        logging.info("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
-        logging.info("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
-        logging.info("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
+        print("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
+        print("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
+        print("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
+        print("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
         
 		global disconnected
         while disconnected:
             try:
-                logging.info("in try.")
-                logging.info("testing get: " + str(urllib.urlopen("http://checkip.amazonaws.com")))
+                print("in try.")
+                print("testing get: " + str(urllib.urlopen("http://checkip.amazonaws.com")))
                 disconnected = False
-                logging.info("SUCCESSFUL CONNECTION")
+                print("SUCCESSFUL CONNECTION")
             except Exception as e:
-                logging.info("exception occurred.  restarting iface  and trying again: " + str(e))
-                logging.info("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
-                logging.info("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
-        logging.info("Disconnected is: " + str(disconnected))
+                print("exception occurred.  restarting iface  and trying again: " + str(e))
+                print("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
+                print("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
+        print("Disconnected is: " + str(disconnected))
 		
 def set_configs():
     configfile = os.path.join("/boot", "iot.config")
     lines = list(open(configfile))
     global configs
     for line in lines:
-        logging.info("in for")
+        print("in for")
         parts = line.split("=")
-        logging.info("part 0: " + parts[0])
-        logging.info("part 1: " + parts[1])
+        print("part 0: " + parts[0])
+        print("part 1: " + parts[1])
         configs[parts[0]] = parts[1]
 
 def shutdown(signum, frame):
@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
     # start logging
     logging.basicConfig(filename=LOG_FILE, format=LOG_FORMAT, level=LOG_LEVEL)
-    logging.info("Starting btminder to monitor Bluetooth connections")
+    print("Starting btminder to monitor Bluetooth connections")
 
     # Get the system bus
     try:
@@ -95,5 +95,5 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error("Unable to run the gobject main loop: " + str(e))
 
-    logging.info("Shutting down btminder")
+    print("Shutting down btminder")
     sys.exit(0)
