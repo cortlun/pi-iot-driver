@@ -39,9 +39,9 @@ def device_property_changed_cb(property_name, value, path, interface):
         print("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
         print("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
         print("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
-        
-		global disconnected
+        global disconnected
         while disconnected:
+            print("in while")
             try:
                 print("in try.")
                 print("testing get: " + str(urllib.urlopen("http://checkip.amazonaws.com")))
@@ -51,7 +51,9 @@ def device_property_changed_cb(property_name, value, path, interface):
                 print("exception occurred.  restarting iface  and trying again: " + str(e))
                 print("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
                 print("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
-        print("Disconnected is: " + str(disconnected))
+                print("sleeping 10 seconds.....")
+                time.sleep(10)
+    print("method invocation over")
 		
 def set_configs():
     configfile = os.path.join("/boot", "iot.config")
