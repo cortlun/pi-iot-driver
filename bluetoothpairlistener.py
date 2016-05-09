@@ -38,15 +38,17 @@ def device_property_changed_cb(property_name, value, path, interface):
         logging.info("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
         logging.info("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
         while disconnected:
-		    try:
+            try:
                 logging.info("in try.")
                 logging.info("testing get: " + urllib.open("http://google.com"))
-				disconnected = False
+                disconnected = False
+				logging.info("SUCCESSFUL CONNECTION")
             except Exception as e:
                 logging.info("exception occurred.  restarting iface  and trying again: " + str(e))
                 logging.info("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
-                logging.info("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0]))
-
+                logging.info("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
+        print("Disconnected is: " + str(disconnected))
+		
 def set_configs():
     configfile = os.path.join("/boot", "iot.config")
     lines = list(open(configfile))
