@@ -28,7 +28,6 @@ def device_property_changed_cb(property_name, value, path, interface):
 #
 # Replace with your code to write to the PiFace
 #
-
         set_configs()
         print("value: " + str(value))
         print("interface: " + str(interface))
@@ -36,6 +35,7 @@ def device_property_changed_cb(property_name, value, path, interface):
         print("The device %s [%s] is %s " % (properties["Alias"], properties["Address"], action))
         cp = ChildProcessUtils()
         mac = configs['IPHONE_MAC_ADDRESS'].replace('\n', '').replace('\r', '').replace(' ', '')
+<<<<<<< HEAD
         global disconnected
         print("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
         print("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
@@ -46,6 +46,14 @@ def device_property_changed_cb(property_name, value, path, interface):
         except:
             print("exception testing get")
         print("starting while")
+=======
+        logging.info("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
+        logging.info("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
+        logging.info("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
+        logging.info("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
+        
+		global disconnected
+>>>>>>> e859f1106c470b2560d5029ce6a9f265a38f1eb1
         while disconnected:
             print("in while")
             try:
