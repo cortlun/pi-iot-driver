@@ -72,8 +72,10 @@ if __name__ == "__main__":
     
     #create firewall rules
     logging.info("creating firewall rules...")
-    open_firewall()
-    
+    try:
+        open_firewall()
+    except:
+        pass
     #start geotagger
     logging.info("starting geotagger...")
     gt = GeoTagger()
@@ -89,14 +91,14 @@ if __name__ == "__main__":
     logging.info("ip: " + ip)
     d = configs['DISCRIMINATOR'].replace('\n','').replace('\r','').replace(' ','')
     logging.info(d)
-	try :
+    try :
         producer = IotProducer(ip, d)
     except Exception as e: 
-	    logging.info("Exception creating producer:" + str(e))
-		sys.exit(1)
+        logging.info("Exception creating producer:" + str(e))
+        sys.exit(1)
     
     #create and enqueue json every x seconds
-	try :
+    try :
         while True:
             logging.info("getting payload...")
             payload = sensor.check_sensor()
@@ -109,10 +111,10 @@ if __name__ == "__main__":
             logging.info("enqueue succeeded!!!!!!!!!!")
             time.sleep(float(configs['ENQUEUE_SECONDS']))
     except KeyboardInterrupt:
-	    pass
+        pass
     except Exception as e:
-	    logging.info("exception: " + str(e))
-		sys.exit(1)
-		
-	logging.info("shutting down."
-	sys.exit(0)
+        logging.info("exception: " + str(e))
+        sys.exit(1)
+
+    logging.info("shutting down.")
+    sys.exit(0)

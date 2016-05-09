@@ -6,6 +6,7 @@ import dbus
 import dbus.service
 import dbus.mainloop.glib
 import gobject
+import urllib
 import os
 from awsutils import ChildProcessUtils
 
@@ -21,7 +22,7 @@ LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
 def device_property_changed_cb(property_name, value, path, interface):
     device = dbus.Interface(bus.get_object("org.bluez", path), "org.bluez.Device")
     properties = device.GetProperties()
-
+    logging.info("property name: " + property_name)
     if (property_name == "Connected"):
         action = "connected" if value else "disconnected"
 #
@@ -37,17 +38,18 @@ def device_property_changed_cb(property_name, value, path, interface):
         mac = configs['IPHONE_MAC_ADDRESS'].replace('\n', '').replace('\r', '').replace(' ', '')
         logging.info("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
         logging.info("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
+        global disconnected
         while disconnected:
             try:
                 logging.info("in try.")
-                logging.info("testing get: " + urllib.open("http://google.com"))
+                logging.info("testing get: " + str(urllib.urlopen("http://checkip.amazonaws.com")))
                 disconnected = False
-				logging.info("SUCCESSFUL CONNECTION")
+                logging.info("SUCCESSFUL CONNECTION")
             except Exception as e:
                 logging.info("exception occurred.  restarting iface  and trying again: " + str(e))
                 logging.info("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
                 logging.info("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
-        print("Disconnected is: " + str(disconnected))
+        logging.info("Disconnected is: " + str(disconnected))
 		
 def set_configs():
     configfile = os.path.join("/boot", "iot.config")
