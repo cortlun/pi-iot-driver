@@ -13,7 +13,7 @@ configs = {}
  
 LOG_LEVEL = logging.INFO
 #LOG_LEVEL = logging.DEBUG
-LOG_FILE = "/home/pi/bluetoothpairlistener.out"
+LOG_FILE = "/home/pi/logs/bt.out"
 #LOG_FILE = "/var/log/syslog"
 LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
 
@@ -35,8 +35,16 @@ def device_property_changed_cb(property_name, value, path, interface):
         cp = ChildProcessUtils()
         mac = configs['IPHONE_MAC_ADDRESS'].replace('\n', '').replace('\r', '').replace(' ', '')
         logging.info("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
-        logging.info("pand" + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
-        
+        logging.info("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
+        #logging.info("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
+        #logging.info("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))        
+        try:
+            logging.info("in try.")
+            logging.info("testing get: " + urllib.open("http://google.com"))
+        except:
+            logging.info("exception occurred.  restarting iface  and trying again.")
+            logging.info("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
+            logging.info("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0]))
 def set_configs():
     configfile = os.path.join("/boot", "iot.config")
     lines = list(open(configfile))

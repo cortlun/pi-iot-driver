@@ -8,7 +8,6 @@ from initfirewallconfigs import FirewallRuleConfig, FirewallRuleInstance
 from sensorinterface import SensorInterface
 from dataproducer import IotProducer
 import logging
-logging.basicFileConfig(filename='\home\pi\logs\iot.out',level=logging.info)
 gpsd = None #global gpsd variable
 configs = {} #dictionary object to store configs
 config_location = "/etc/boot"
@@ -40,10 +39,7 @@ def set_configs():
     lines = list(open(configfile))
     global configs
     for line in lines:
-        logging.info("in for")
         parts = line.split("=")
-        logging.info("part 0: " + parts[0])
-        logging.info("part 1: " + parts[1])
         configs[parts[0]] = parts[1]
     
 def open_firewall():
@@ -66,6 +62,7 @@ def create_json(geotag, payload):
     return '{"message": {' + geotag + "," + payload + "}}"
 
 if __name__ == "__main__":
+    logging.basicConfig(filename="/home/pi/logs/iot.out",level=logging.INFO)
     #get environment configs
     logging.info("setting configs...")
     set_configs()
