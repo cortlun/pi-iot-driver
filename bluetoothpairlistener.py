@@ -11,7 +11,6 @@ import os
 from awsutils import ChildProcessUtils
 
 configs = {}
-disconnected = True
  
 LOG_LEVEL = logging.INFO
 #LOG_LEVEL = logging.DEBUG
@@ -28,17 +27,18 @@ def device_property_changed_cb(property_name, value, path, interface):
 #
 # Replace with your code to write to the PiFace
 #
-        set_configs()
-        print("value: " + str(value))
-        print("interface: " + str(interface))
-        print("path: " + str(path))
-        print("The device %s [%s] is %s " % (properties["Alias"], properties["Address"], action))
-        cp = ChildProcessUtils()
-        mac = configs['IPHONE_MAC_ADDRESS'].replace('\n', '').replace('\r', '').replace(' ', '')
-        print("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
-        print("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
-        #print("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
-        #print("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
+        if (action=="connected"):
+            set_configs()
+            print("value: " + str(value))
+            print("interface: " + str(interface))
+            print("path: " + str(path))
+            print("The device %s [%s] is %s " % (properties["Alias"], properties["Address"], action))
+            cp = ChildProcessUtils()
+            mac = configs['IPHONE_MAC_ADDRESS'].replace('\n', '').replace('\r', '').replace(' ', '')
+            print("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
+            print("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
+            #print("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
+            #print("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
     print("method invocation over")
 		
 def set_configs():
@@ -46,10 +46,7 @@ def set_configs():
     lines = list(open(configfile))
     global configs
     for line in lines:
-        print("in for")
         parts = line.split("=")
-        print("part 0: " + parts[0])
-        print("part 1: " + parts[1])
         configs[parts[0]] = parts[1]
 
 def shutdown(signum, frame):
@@ -61,6 +58,8 @@ if __name__ == "__main__":
 
     # start logging
     logging.basicConfig(filename=LOG_FILE, format=LOG_FORMAT, level=LOG_LEVEL)
+    #chp = ChildProcessUtils()
+    #chp.spawn_child_process(["sudo", "/etc/init.d/bluetooth", "restart"])
     print("Starting btminder to monitor Bluetooth connections")
 
     # Get the system bus
