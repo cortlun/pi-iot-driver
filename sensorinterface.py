@@ -15,7 +15,7 @@ class TemperatureInterface:
             c = float(temp_line[temp_line.index("t=") + len("t="):]) / 1000
             f = c * 1.8 + 32
             k = c + 273.15
-            return('payload:{"fahrenheit":'+str(f)+',"celsius":'+str(c)+',"kelvin":'+str(k)+'}')
+            return('"payload":{"fahrenheit":"'+str(f)+'"'+',"celsius":'+'"'+str(c)+'"'+',"kelvin":'+'"'+str(k)+'"'+'}')
 
 if __name__ == "__main__":
     test = TemperatureInterface()

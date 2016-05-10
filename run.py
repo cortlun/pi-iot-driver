@@ -58,13 +58,10 @@ def open_firewall():
     #os.environ['AWS_DEFAULT_REGION'] = configs['AWS_REGION']
 
 def check_geotag():
-    try:
-        orig_datetime = parse(gpsd.utc)
-        gmt = orig_datetime + datetime.timedelta(weeks=1024)
-        gmt_offset = gmt + datetime.timedelta(hours=-5)
-    except:
-        gmt_offset="err"
-    return '"geotag":{"lat":' + str(gpsd.fix.latitude) + ',"lon":' + str(gpsd.fix.longitude) + ',"time":' + str(gmt_offset) + ',"alt":' + str(gpsd.fix.altitude) + ',"cnt":' + str(len(gpsd.satellites)) + '}'
+    orig_datetime = parse(gpsd.utc)
+    gmt = orig_datetime + datetime.timedelta(weeks=1024)
+    gmt_offset = gmt + datetime.timedelta(hours=-5)
+    return '"geotag":{"lat":' + '"' + str(gpsd.fix.latitude) + '"' + ',"lon":' + '"' +str(gpsd.fix.longitude) +'"' + ',"time":' + '"'+str(gmt_offset) +'"'+ ',"alt":' + '"' + str(gpsd.fix.altitude) +'"' + ',"cnt":' + '"' +str(len(gpsd.satellites))+'"' + '}'
     
 def create_json(geotag, payload):
     return '{"message": {' + geotag + "," + payload + "}}"
