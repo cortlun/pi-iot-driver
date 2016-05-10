@@ -1,9 +1,8 @@
 from subprocess import Popen, PIPE
 import os
 from os.path import expanduser
-import urllib
+import urllib 
 #from Crypto.PublicKey import RSA
-
 class ChildProcessUtils:
     def __init__(self):
         self.user_home = os.path.expanduser("~")

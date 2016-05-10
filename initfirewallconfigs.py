@@ -7,6 +7,7 @@ class FirewallRuleConfig:
         self.aws_utils = AwsUtils()
     def open_firewall(self):
         for firewall_rule_instance in self.firewall_rule_instances:
+            print("opening firewall.")
             self.aws_utils.authorize_firewall_privelege(self.security_group_name, firewall_rule_instance.port, firewall_rule_instance.protocol)
 
 class FirewallRuleInstance:
