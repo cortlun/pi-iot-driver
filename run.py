@@ -59,7 +59,7 @@ def open_firewall():
 
 def check_geotag():
     orig_datetime = parse(gpsd.utc)
-    gmt = date_orig_parsed + datetime.timedelta(weeks=1024)
+    gmt = orig_datetime + datetime.timedelta(weeks=1024)
     gmt_offset = gmt + datetime.timedelta(hours=-5)
     return '"geotag":{"lat":' + str(gpsd.fix.latitude) + ',"lon":' + str(gpsd.fix.longitude) + ',"time":' + str(gmt_offset) + ',"alt":' + str(gpsd.fix.altitude) + ',"cnt":' + str(len(gpsd.satellites)) + '}'
     
