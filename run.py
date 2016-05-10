@@ -8,6 +8,8 @@ from initfirewallconfigs import FirewallRuleConfig, FirewallRuleInstance
 from dataproducer import IotProducer
 import logging
 import importlib
+from dateutil.parser import parse
+import datetime
 
 gpsd = None #global gpsd variable
 configs = {} #dictionary object to store configs
@@ -56,7 +58,10 @@ def open_firewall():
     #os.environ['AWS_DEFAULT_REGION'] = configs['AWS_REGION']
 
 def check_geotag():
-    return '"geotag":{"lat":' + str(gpsd.fix.latitude) + ',"lon":' + str(gpsd.fix.longitude) + ',"time":' + str(gpsd.utc) + str(gpsd.fix.time) + ',"alt":' + str(gpsd.fix.altitude) + ',"cnt":' + str(len(gpsd.satellites)) + '}'
+    orig_datetime = parse(gpsd.utc)
+    gmt = date_orig_parsed + datetime.timedelta(weeks=1024)
+    gmt_offset = gmt + datetime.timedelta(hours=-5)
+    return '"geotag":{"lat":' + str(gpsd.fix.latitude) + ',"lon":' + str(gpsd.fix.longitude) + ',"time":' + str(gmt_offset) + ',"alt":' + str(gpsd.fix.altitude) + ',"cnt":' + str(len(gpsd.satellites)) + '}'
     
 def create_json(geotag, payload):
     return '{"message": {' + geotag + "," + payload + "}}"
