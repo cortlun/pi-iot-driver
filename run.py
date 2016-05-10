@@ -5,9 +5,10 @@ import time
 import threading
 import sensorinterface
 from initfirewallconfigs import FirewallRuleConfig, FirewallRuleInstance
-from sensorinterface import SensorInterface
 from dataproducer import IotProducer
 import logging
+import importlib
+
 gpsd = None #global gpsd variable
 configs = {} #dictionary object to store configs
 sensorinterface = None
@@ -82,7 +83,8 @@ if __name__ == "__main__":
     
     #create sensorinterface
     logging.info("creating sensor...")
-    sensor = SensorInterface()
+    module = importlib.import_module("sensorinterface")
+    sensor = getattr(module, configs["SENSOR_INTERFACE"].replace('\n', '').replace('\r', '').replace(' ', ''))()
     
     #create kafka producer
     logging.info("starting kafka producer...")
@@ -99,11 +101,8 @@ if __name__ == "__main__":
     #create and enqueue json every x seconds
     try :
         while True:
-            logging.info("getting payload...")
             payload = sensor.check_sensor()
-            logging.info("payload: " + payload)
             geotag = check_geotag()
-            logging.info("geotag: " + geotag)
             m = create_json(geotag, payload)
             logging.info("whole message: " + m)
             producer.enqueue(m)
