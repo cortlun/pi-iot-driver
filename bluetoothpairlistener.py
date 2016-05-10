@@ -13,7 +13,7 @@ from awsutils import ChildProcessUtils
 configs = {}
 disconnected = True
  
-LOG_LEVEL = print
+LOG_LEVEL = logging.INFO
 #LOG_LEVEL = logging.DEBUG
 LOG_FILE = "/home/pi/logs/bt.out"
 #LOG_FILE = "/var/log/syslog"
@@ -37,22 +37,8 @@ def device_property_changed_cb(property_name, value, path, interface):
         mac = configs['IPHONE_MAC_ADDRESS'].replace('\n', '').replace('\r', '').replace(' ', '')
         print("command: " + "sudo pand -c " + mac + " -role PANU --persist 30")
         print("pand: " + cp.spawn_child_process(["sudo","pand","-c", mac,"-role", "PANU", "--persist", "30"]))
-        print("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
-        print("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
-        global disconnected
-        while disconnected:
-            print("in while")
-            try:
-                print("in try.")
-                print("testing get: " + str(urllib.urlopen("http://checkip.amazonaws.com")))
-                disconnected = False
-                print("SUCCESSFUL CONNECTION")
-            except Exception as e:
-                print("exception occurred.  restarting iface  and trying again: " + str(e))
-                print("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
-                print("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
-                print("sleeping 10 seconds.....")
-                time.sleep(10)
+        #print("ifdown: " + cp.spawn_child_process(["sudo", "ifdown", "bnep0"]))
+        #print("ifup: " + cp.spawn_child_process(["sudo", "ifup", "bnep0"]))
     print("method invocation over")
 		
 def set_configs():
